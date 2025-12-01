@@ -1,19 +1,19 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Blackjack RL Agent</title>
+    <title>Blackjack RL Agent Demo</title>
     <style>
         body { font-family: Arial; background: #0a0f24; color: white; text-align: center; }
         #game { margin-top: 40px; }
         .hand { margin: 20px; }
         button { padding: 10px 20px; margin: 10px; font-size: 18px; }
         #log { white-space: pre-wrap; margin-top: 20px; text-align: left; max-width: 600px; margin: 0 auto; }
+        canvas { background: #111; display: block; margin: 20px auto; border: 1px solid white; }
     </style>
 </head>
 <body>
 
-<h1>Blackjack with Reinforcement Learning</h1>
+<h1>Blackjack </h1>
 <div id="game">
     <div class="hand">
         <h2>Dealer</h2>
@@ -27,18 +27,20 @@
     <button onclick="hit()">Hit</button>
     <button onclick="stand()">Stand</button>
     <button onclick="startGame()">New Game</button>
+    <button onclick="agentPlay()">Agent Plays</button>
 
     <h3 id="result"></h3>
 </div>
 
-<h2>Training Controls</h2>
-<button onclick="trainAgent(5000)">Train 5k Episodes</button>
-<button onclick="trainAgent(50000)">Train 50k Episodes</button>
+<h2>Training & Evaluation</h2>
+<button onclick="trainAndPlot(5000)">Train 5k Episodes</button>
+<button onclick="trainAndPlot(50000)">Train 50k Episodes</button>
+<button onclick="agentPlayMultiple(100)">Agent Plays 100 Rounds</button>
 
+<canvas id="learningCurve" width="600" height="300"></canvas>
 <div id="log"></div>
 
 <script src="blackjack.js"></script>
 <script src="rl_agent.js"></script>
-
 </body>
 </html>

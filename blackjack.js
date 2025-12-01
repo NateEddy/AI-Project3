@@ -12,8 +12,16 @@ function dealCard() {
     return deck.pop();
 }
 
+function cardToString(card) {
+    if (card === 1) return "A";
+    if (card === 11) return "J";
+    if (card === 12) return "Q";
+    if (card === 13) return "K";
+    return card;
+}
+
 function handValue(hand) {
-    let sum = hand.reduce((a,b) => a + Math.min(b, 10), 0);
+    let sum = hand.reduce((a,b) => a + Math.min(b,10), 0);
     let ace = hand.includes(1);
     if (ace && sum + 10 <= 21) return { value: sum + 10, usableAce: true };
     return { value: sum, usableAce: false };
@@ -24,17 +32,19 @@ function startGame() {
     playerHand = [dealCard(), dealCard()];
     dealerHand = [dealCard(), dealCard()];
 
+    document.getElementById("result").innerText = "";
     render();
 }
 
 function hit() {
     playerHand.push(dealCard());
-    render();
+    let playerVal = handValue(playerHand).value;
+    if (playerVal > 21) stand();
+    else render();
 }
 
 function stand() {
-    while (handValue(dealerHand).value < 17)
-        dealerHand.push(dealCard());
+    while (handValue(dealerHand).value < 17) dealerHand.push(dealCard());
     evaluate();
 }
 
@@ -43,14 +53,26 @@ function evaluate() {
     let d = handValue(dealerHand).value;
 
     let result = "Push";
-    if (p > 21) result = "Player Busts!";
-    else if (d > 21 || p > d) result = "Player Wins!";
+    if (p > 21) result = "Player Busts! Dealer Wins!";
+    else if (d > 21) result = "Dealer Busts! Player Wins!";
+    else if (p > d) result = "Player Wins!";
     else if (p < d) result = "Dealer Wins!";
 
     document.getElementById("result").innerText = result;
+    render(true); 
 }
 
-function render() {
-    document.getElementById("player-hand").innerText = playerHand.join(", ");
-    document.getElementById("dealer-hand").innerText = dealerHand[0] + ", ?";
+function render(revealDealer=false) {
+    document.getElementById("player-hand").innerText =
+        playerHand.map(cardToString).join(", ");
+
+    if (revealDealer) {
+        document.getElementById("dealer-hand").innerText =
+            dealerHand.map(cardToString).join(", ");
+    } else {
+        document.getElementById("dealer-hand").innerText =
+            cardToString(dealerHand[0]) + ", ?";
+    }
 }
+
+startGame();
