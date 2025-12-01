@@ -23,8 +23,8 @@ function cardToString(card) {
 function handValue(hand) {
     let sum = hand.reduce((a,b) => a + Math.min(b,10), 0);
     let ace = hand.includes(1);
-    if (ace && sum + 10 <= 21) return { value: sum + 10, usableAce: true };
-    return { value: sum, usableAce: false };
+    if (ace && sum + 10 <= 21) return { value: sum + 10, aceCard: true };
+    return { value: sum, aceCard: false };
 }
 
 function startGame() {

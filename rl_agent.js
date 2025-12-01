@@ -1,9 +1,8 @@
-// --- RL Agent ---
 let Q = {};
 const actions = ["hit", "stand"];
 
-function getState(playerValue, dealerUp, usableAce) {
-    return `${playerValue}_${dealerUp}_${usableAce ? 1 : 0}`;
+function getState(playerValue, dealerUp, aceCard) {
+    return `${playerValue}_${dealerUp}_${aceCard ? 1 : 0}`;
 }
 
 function greedy(state, epsilon=0.1) {
@@ -12,7 +11,6 @@ function greedy(state, epsilon=0.1) {
     return Q[state].hit > Q[state].stand ? "hit" : "stand";
 }
 
-// Monte Carlo training with reward tracking for learning curve
 function trainAgent(episodes, logInterval=500) {
     let rewards = [];
     let totalReward = 0;
@@ -24,10 +22,10 @@ function trainAgent(episodes, logInterval=500) {
 
         let trajectory = [];
         while (true) {
-            let { value, usableAce } = handValue(playerHand);
+            let { value, aceCard } = handValue(playerHand);
             if (value > 21) break;
 
-            let state = getState(value, dealerHand[0], usableAce);
+            let state = getState(value, dealerHand[0], aceCard);
             let action = greedy(state);
 
             trajectory.push({state, action});
@@ -36,7 +34,7 @@ function trainAgent(episodes, logInterval=500) {
             else break;
         }
 
-        let reward = simulateDealerAndReward();
+        let reward = simulation();
         totalReward += reward;
 
         for (let step of trajectory) {
@@ -54,7 +52,7 @@ document.getElementById("log").innerText =
     return rewards;
 }
 
-function simulateDealerAndReward() {
+function simulation() {
     let p = handValue(playerHand).value;
     while (handValue(dealerHand).value < 17) dealerHand.push(dealCard());
     let d = handValue(dealerHand).value;
@@ -110,10 +108,10 @@ function agentPlay() {
     render();
 
     function agentTurn() {
-        let { value, usableAce } = handValue(playerHand);
+        let { value, aceCard } = handValue(playerHand);
         if (value > 21) { stand(); return; }
 
-        let state = getState(value, dealerHand[0], usableAce);
+        let state = getState(value, dealerHand[0], aceCard);
         let action = greedy(state, 0);
         logAction("Player chooses: " + action);
 
@@ -137,7 +135,6 @@ function agentPlayMore(rounds) {
     let wins = 0, losses = 0, draws = 0;
     let currentRound = 0;
     document.getElementById("log").innerText = "";
-    document.getElementById("result").innerText = "Playing rounds...";
 
     function playRound() {
         deck = newDeck();
@@ -145,17 +142,17 @@ function agentPlayMore(rounds) {
         dealerHand = [dealCard(), dealCard()];
 
         function agentTurn() {
-            let { value, usableAce } = handValue(playerHand);
+            let { value, aceCard } = handValue(playerHand);
             if (value > 21) { finishRound(-1); return; }
 
-            let state = getState(value, dealerHand[0], usableAce);
+            let state = getState(value, dealerHand[0], aceCard);
             let action = greedy(state, 0);
 
             if (action === "hit") {
                 playerHand.push(dealCard());
                 setTimeout(agentTurn, 0);
             } else {
-                finishRound(simulateDealerAndReward());
+                finishRound(simulation());
             }
         }
 
@@ -178,3 +175,7 @@ function agentPlayMore(rounds) {
 
     playRound();
 }
+
+
+//Work Cited: Used the following website to help with some lines of code: https://gymnasium.farama.org/v0.26.3/tutorials/blackjack_tutorial/
+//ChatGPT helped with some syntax, specifically for generating the graph
