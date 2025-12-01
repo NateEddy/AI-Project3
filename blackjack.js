@@ -5,7 +5,14 @@ function newDeck() {
     for (let i = 1; i <= 13; i++) {
         for (let j = 0; j < 4; j++) cards.push(i);
     }
-    return cards.sort(() => Math.random() - 0.5);
+
+    // Fisher–Yates shuffle
+    for (let i = cards.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+
+    return cards;
 }
 
 function dealCard() {
