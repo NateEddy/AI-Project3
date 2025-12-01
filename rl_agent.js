@@ -6,7 +6,7 @@ function getState(playerValue, dealerUp, usableAce) {
     return `${playerValue}_${dealerUp}_${usableAce ? 1 : 0}`;
 }
 
-function epsilonGreedy(state, epsilon=0.1) {
+function greedy(state, epsilon=0.1) {
     if (Math.random() < epsilon) return actions[Math.floor(Math.random()*2)];
     if (!Q[state]) Q[state] = { hit: 0, stand: 0 };
     return Q[state].hit > Q[state].stand ? "hit" : "stand";
@@ -14,7 +14,7 @@ function epsilonGreedy(state, epsilon=0.1) {
 
 // Monte Carlo training with reward tracking for learning curve
 function trainAgent(episodes, logInterval=500) {
-    let rewardsHistory = [];
+    let rewards = [];
     let totalReward = 0;
 
     for (let ep = 1; ep <= episodes; ep++) {
@@ -28,7 +28,7 @@ function trainAgent(episodes, logInterval=500) {
             if (value > 21) break;
 
             let state = getState(value, dealerHand[0], usableAce);
-            let action = epsilonGreedy(state);
+            let action = greedy(state);
 
             trajectory.push({state, action});
 
@@ -45,12 +45,13 @@ function trainAgent(episodes, logInterval=500) {
         }
 
         if (ep % logInterval === 0) {
-            rewardsHistory.push({episode: ep, avgReward: totalReward / ep});
+            rewards.push({episode: ep, avgReward: totalReward / ep});
         }
     }
 
-    document.getElementById("log").innerText = "Training complete.";
-    return rewardsHistory;
+document.getElementById("log").innerText =
+    `\nEpisodes: ${episodes}\nFinal average reward: ${(totalReward / episodes).toFixed(3)}`;
+    return rewards;
 }
 
 function simulateDealerAndReward() {
@@ -64,8 +65,7 @@ function simulateDealerAndReward() {
     return 0;
 }
 
-// --- Learning Curve Plot ---
-function plotLearningCurve(data) {
+function learningGraph(data) {
     const canvas = document.getElementById("learningCurve");
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -86,8 +86,6 @@ function plotLearningCurve(data) {
     ctx.strokeStyle = "lime";
     ctx.lineWidth = 2;
     ctx.stroke();
-
-    // Axes
     ctx.strokeStyle = "white";
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -97,13 +95,11 @@ function plotLearningCurve(data) {
     ctx.stroke();
 }
 
-// --- Combined function for buttons ---
 function trainAndPlot(episodes) {
     const data = trainAgent(episodes, Math.floor(episodes/100));
-    plotLearningCurve(data);
+    learningGraph(data);
 }
 
-// --- Agent demonstration ---
 function agentPlay() {
     deck = newDeck();
     playerHand = [dealCard(), dealCard()];
@@ -118,7 +114,7 @@ function agentPlay() {
         if (value > 21) { stand(); return; }
 
         let state = getState(value, dealerHand[0], usableAce);
-        let action = epsilonGreedy(state, 0);
+        let action = greedy(state, 0);
         logAction("Player chooses: " + action);
 
         if (action === "hit") {
@@ -137,8 +133,7 @@ function agentPlay() {
     agentTurn();
 }
 
-// --- Agent plays multiple rounds ---
-function agentPlayMultiple(rounds) {
+function agentPlayMore(rounds) {
     let wins = 0, losses = 0, draws = 0;
     let currentRound = 0;
     document.getElementById("log").innerText = "";
@@ -154,7 +149,7 @@ function agentPlayMultiple(rounds) {
             if (value > 21) { finishRound(-1); return; }
 
             let state = getState(value, dealerHand[0], usableAce);
-            let action = epsilonGreedy(state, 0);
+            let action = greedy(state, 0);
 
             if (action === "hit") {
                 playerHand.push(dealCard());
