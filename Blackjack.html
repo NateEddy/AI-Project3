@@ -3,42 +3,90 @@
 <head>
     <title>Blackjack RL Agent Demo</title>
     <style>
-        body { font-family: Arial; background: #0a0f24; color: white; text-align: center; }
-        #game { margin-top: 40px; }
-        .hand { margin: 20px; }
-        button { padding: 10px 20px; margin: 10px; font-size: 18px; }
-        #log { white-space: pre-wrap; margin-top: 20px; text-align: left; max-width: 600px; margin: 0 auto; }
-        canvas { background: #111; display: block; margin: 20px auto; border: 1px solid white; }
+        body { 
+            font-family: Arial; 
+            background: #0a0f24; 
+            color: white; 
+            text-align: center; 
+        }
+
+        #game-box {
+            display: inline-block;       
+            padding: 30px 40px;               /* extra horizontal padding for symmetry */
+            background-color: #1e2438;   
+            border-radius: 20px;         
+            box-shadow: 0 0 20px rgba(0,0,0,0.5); 
+            margin: 20px auto;           
+            text-align: center;          
+            max-width: 800px;            
+        }
+
+        #game { 
+            margin-top: 20px; 
+        }
+
+        .hand { 
+            margin: 20px; 
+        }
+
+        button { 
+            padding: 10px 20px; 
+            margin: 10px; 
+            font-size: 18px; 
+            cursor: pointer;
+        }
+
+        #log { 
+            white-space: pre-wrap; 
+            margin-top: 20px; 
+            text-align: left; 
+            max-width: 700px; 
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        canvas { 
+            background: #111; 
+            display: block; 
+            margin: 20px auto; 
+            border: 1px solid white; 
+        }
     </style>
 </head>
 <body>
 
-<h1>Blackjack </h1>
-<div id="game">
-    <div class="hand">
-        <h2>Dealer</h2>
-        <div id="dealer-hand"></div>
+<!-- All content inside a single rounded box -->
+<div id="game-box">
+
+    <h1>Blackjack</h1>
+
+    <div id="game">
+        <div class="hand">
+            <h2>Dealer</h2>
+            <div id="dealer-hand"></div>
+        </div>
+        <div class="hand">
+            <h2>Player</h2>
+            <div id="player-hand"></div>
+        </div>
+
+        <button onclick="hit()">Hit</button>
+        <button onclick="stand()">Stand</button>
+        <button onclick="startGame()">New Game</button>
+        <button onclick="agentPlay()">Agent Plays</button>
+
+        <h3 id="result"></h3>
     </div>
-    <div class="hand">
-        <h2>Player</h2>
-        <div id="player-hand"></div>
-    </div>
 
-    <button onclick="hit()">Hit</button>
-    <button onclick="stand()">Stand</button>
-    <button onclick="startGame()">New Game</button>
-    <button onclick="agentPlay()">Agent Plays</button>
+    <h2>Training the agent</h2>
+    <button onclick="trainAndPlot(5000)">Train 5k Episodes</button>
+    <button onclick="trainAndPlot(50000)">Train 50k Episodes</button>
+    <button onclick="agentPlayMore(100)">Agent Plays 100 Rounds</button>
 
-    <h3 id="result"></h3>
-</div>
+    <canvas id="learningCurve" width="600" height="300"></canvas>
+    <div id="log"></div>
 
-<h2>Training the agent</h2>
-<button onclick="trainAndPlot(5000)">Train 5k Episodes</button>
-<button onclick="trainAndPlot(50000)">Train 50k Episodes</button>
-<button onclick="agentPlayMore(100)">Agent Plays 100 Rounds</button>
-
-<canvas id="learningCurve" width="600" height="300"></canvas>
-<div id="log"></div>
+</div> <!-- end of game-box -->
 
 <script src="blackjack.js"></script>
 <script src="rl_agent.js"></script>
